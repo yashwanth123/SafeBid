@@ -21,6 +21,7 @@ const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(72),
   name: z.string().min(2).max(80),
+  inviteCode: z.string().max(80).optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional(),
   address: z.string().max(200).optional(),
@@ -56,7 +57,10 @@ authRouter.post(
   "/register",
   validate(registerSchema),
   asyncHandler(async (req, res) => {
-    const { email, password, name, latitude, longitude, address, city } = req.body;
+    const { email, password, name, inviteCode, latitude, longitude, address, city } = req.body;
+    if (env.INVITE_CODE && inviteCode?.trim() !== env.INVITE_CODE) {
+      throw unauthorized("That invite code is not valid");
+    }
     const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     if (existing) throw conflict("An account with this email already exists");
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -16,10 +16,23 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteRequired, setInviteRequired] = useState(true);
+  const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    api<{ inviteRequired: boolean }>("/api/meta", { skipAuth: true })
+      .then((m) => setInviteRequired(m.inviteRequired))
+      .catch(() => undefined);
+  }, []);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!accepted) {
+      toast.error("Please confirm this is a private beta.");
+      return;
+    }
     setLoading(true);
     try {
       const data = await api<{ accessToken: string; refreshToken: string; user: Me }>(
@@ -27,7 +40,7 @@ export default function RegisterPage() {
         {
           method: "POST",
           skipAuth: true,
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify({ name, email, password, inviteCode }),
         },
       );
       setSession(data.accessToken, data.refreshToken, data.user);
@@ -44,7 +57,7 @@ export default function RegisterPage() {
     <div className="mx-auto max-w-md pt-8">
       <h1 className="font-serif text-4xl">Just the essentials.</h1>
       <p className="mt-2 text-sm text-forest-700/70">
-        Name, email, password. We’ll ask for your street on the next screen.
+        Name, email, password, and an invite. We’ll pin your street on the next screen.
       </p>
       <Card className="mt-6">
         <form onSubmit={onSubmit} className="space-y-3">
@@ -64,6 +77,22 @@ export default function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <Input
+            required={inviteRequired}
+            placeholder="Invite code"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+          />
+          <label className="flex items-start gap-2 text-xs text-forest-700/80">
+            <input
+              type="checkbox"
+              className="mt-0.5"
+              checked={accepted}
+              onChange={(e) => setAccepted(e.target.checked)}
+            />
+            I understand this is a private friends beta. Payments and ID checks are simulated until
+            Stripe is live.
+          </label>
           <Button className="w-full" disabled={loading}>
             {loading ? "Creating…" : "Create account"}
           </Button>

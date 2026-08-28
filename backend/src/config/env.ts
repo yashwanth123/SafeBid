@@ -36,6 +36,7 @@ const schema = z.object({
   STRIPE_IDENTITY_RETURN_URL: z.string().optional().default(""),
   UPLOAD_DIR: z.string().default("uploads"),
   MAX_UPLOAD_MB: z.coerce.number().default(8),
+  INVITE_CODE: z.string().optional().default(""),
 });
 
 const parsed = schema.safeParse(process.env);

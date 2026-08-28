@@ -6,20 +6,20 @@ export default function LandingPage() {
     <div className="space-y-16 pb-8">
       <section className="relative overflow-hidden rounded-[2.2rem] bg-forest-600 px-6 py-16 text-white md:px-12 md:py-20">
         <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-forest-400/40 blur-3xl" />
-        <p className="text-sm uppercase tracking-[0.2em] text-forest-100">Your block, with receipts</p>
+        <p className="text-sm uppercase tracking-[0.2em] text-forest-100">Private friends beta</p>
         <h1 className="mt-4 max-w-2xl font-serif text-4xl leading-tight md:text-6xl">
           Know the person. Hold the payment. Live next door.
         </h1>
         <p className="mt-5 max-w-xl text-forest-50/90">
-          SafeBid is a neighborhood feed and services marketplace. Providers verify a government ID.
-          Customer funds sit in escrow until the job is done — we keep 5% to keep the lights on.
+          SafeBid is a neighborhood feed and services marketplace. Invite-only for now — you need a
+          code from Yashwanth. Payments and ID verification are simulated until Stripe is connected.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/register"
             className="rounded-full bg-white px-6 py-3 text-sm font-medium text-forest-700"
           >
-            Join your neighborhood
+            Join with an invite
           </Link>
           <Link
             href="/login"

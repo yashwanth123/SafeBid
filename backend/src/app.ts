@@ -55,10 +55,28 @@ export function createApp() {
     res.json({ ok: true, name: "safebid-api", time: new Date().toISOString() });
   });
 
+  app.get("/api/meta", (_req, res) => {
+    res.json({
+      name: "safebid",
+      inviteRequired: Boolean(env.INVITE_CODE),
+      mockPayments: env.MOCK_PAYMENTS,
+      mockIdentity: env.MOCK_IDENTITY,
+    });
+  });
+
   app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
   app.get("/api/docs.json", (_req, res) => res.json(openApiSpec));
 
-  app.use("/api/auth", authRouter);
+  app.use(
+    "/api/auth",
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: env.NODE_ENV === "test" ? 1000 : 40,
+      standardHeaders: true,
+      legacyHeaders: false,
+    }),
+    authRouter,
+  );
   app.use("/api/users", usersRouter);
   app.use("/api/posts", postsRouter);
   app.use("/api/services", servicesRouter);

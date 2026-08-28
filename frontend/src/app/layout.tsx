@@ -3,6 +3,7 @@ import { Fraunces, Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 import { AppShell } from "@/components/AppShell";
+import { DemoBanner } from "@/components/DemoBanner";
 
 const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces" });
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${outfit.variable} ${fraunces.variable} font-sans antialiased`}>
         <Providers>
+          <DemoBanner />
           <AppShell>{children}</AppShell>
         </Providers>
       </body>

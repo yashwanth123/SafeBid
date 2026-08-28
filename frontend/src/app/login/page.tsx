@@ -13,8 +13,8 @@ import { Card } from "@/components/ui/card";
 export default function LoginPage() {
   const { setSession } = useAuth();
   const router = useRouter();
-  const [email, setEmail] = useState("jordan@safebid.local");
-  const [password, setPassword] = useState("Neighborhood1!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [needOtp, setNeedOtp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,7 +49,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-md pt-8">
       <h1 className="font-serif text-4xl">Come inside.</h1>
-      <p className="mt-2 text-sm text-forest-700/70">Demo: jordan@safebid.local / Neighborhood1!</p>
+      <p className="mt-2 text-sm text-forest-700/70">Use the email you signed up with.</p>
       <Card className="mt-6">
         <form onSubmit={onSubmit} className="space-y-3">
           <Input
