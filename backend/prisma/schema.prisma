@@ -1,0 +1,490 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  PROVIDER
+  ADMIN
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  APPLE
+}
+
+enum PostCategory {
+  GENERAL
+  EVENTS
+  LOST_FOUND
+  RECOMMENDATIONS
+  SERVICES
+  JOBS
+}
+
+enum ServiceCategory {
+  HOME
+  OUTDOORS
+  PETS
+  TUTORING
+  WELLNESS
+  TECH
+  MOVING
+  OTHER
+}
+
+enum JobStatus {
+  CREATED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  REVIEWED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  ESCROWED
+  RELEASED
+  REFUNDED
+  FAILED
+}
+
+enum TransactionType {
+  PAYMENT
+  ESCROW_HOLD
+  COMMISSION
+  RELEASE
+  REFUND
+  WITHDRAWAL
+}
+
+enum WithdrawalStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ReportTargetType {
+  USER
+  POST
+  SERVICE
+  BOOKING
+  MESSAGE
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWED
+  DISMISSED
+  ACTION_TAKEN
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+}
+
+enum NotificationType {
+  BOOKING
+  PAYMENT
+  IDENTITY
+  MESSAGE
+  SYSTEM
+  MODERATION
+}
+
+model User {
+  id                      String             @id @default(cuid())
+  email                   String             @unique
+  passwordHash            String?
+  authProvider            AuthProvider       @default(LOCAL)
+  googleId                String?            @unique
+  appleId                 String?            @unique
+  name                    String
+  photoUrl                String?
+  bio                     String?
+  phone                   String?
+  address                 String?
+  city                    String?
+  latitude                Float?
+  longitude               Float?
+  radiusKm                Float              @default(5)
+  ratingAvg               Float              @default(0)
+  ratingCount             Int                @default(0)
+  role                    Role               @default(USER)
+  verificationStatus      VerificationStatus @default(UNVERIFIED)
+  stripeCustomerId        String?
+  stripeAccountId         String?
+  stripeAccountReady      Boolean            @default(false)
+  stripeIdentitySessionId String?
+  twoFactorEnabled        Boolean            @default(false)
+  twoFactorSecret         String?
+  expoPushToken           String?
+  isActive                Boolean            @default(true)
+  isBanned                Boolean            @default(false)
+  lastLoginAt             DateTime?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+
+  refreshTokens      RefreshToken[]
+  posts              Post[]
+  comments           Comment[]
+  likes              Like[]
+  shares             Share[]
+  services           Service[]           @relation("ProviderServices")
+  bookingsAsCustomer Booking[]           @relation("CustomerBookings")
+  bookingsAsProvider Booking[]           @relation("ProviderBookings")
+  reviewsGiven       Review[]            @relation("ReviewsGiven")
+  reviewsReceived    Review[]            @relation("ReviewsReceived")
+  wallet             Wallet?
+  reportsFiled       Report[]            @relation("ReportsFiled")
+  reportsAgainst     Report[]            @relation("ReportsAgainst")
+  notifications      Notification[]
+  conversationsA     Conversation[]      @relation("ConversationUserA")
+  conversationsB     Conversation[]      @relation("ConversationUserB")
+  messages           Message[]
+  disputesOpened     Dispute[]           @relation("DisputesOpened")
+  withdrawals        Withdrawal[]
+  statusEvents       BookingStatusEvent[] @relation("StatusActor")
+
+  @@index([latitude, longitude])
+  @@index([verificationStatus])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+model Post {
+  id        String       @id @default(cuid())
+  authorId  String
+  content   String
+  category  PostCategory @default(GENERAL)
+  latitude  Float?
+  longitude Float?
+  address   String?
+  images    String[]
+  shareCount Int         @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  author    User         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+  likes     Like[]
+  shares    Share[]
+
+  @@index([createdAt])
+  @@index([category])
+  @@index([latitude, longitude])
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  postId    String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@map("comments")
+}
+
+model Like {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, userId])
+  @@map("likes")
+}
+
+model Share {
+  id        String   @id @default(cuid())
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@map("shares")
+}
+
+model Service {
+  id           String          @id @default(cuid())
+  providerId   String
+  title        String
+  description  String
+  priceCents   Int
+  category     ServiceCategory
+  availability Json?
+  images       String[]
+  isActive     Boolean         @default(true)
+  latitude     Float?
+  longitude    Float?
+  address      String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  provider     User            @relation("ProviderServices", fields: [providerId], references: [id], onDelete: Cascade)
+  bookings     Booking[]
+
+  @@index([providerId])
+  @@index([category])
+  @@index([latitude, longitude])
+  @@map("services")
+}
+
+model Booking {
+  id              String        @id @default(cuid())
+  serviceId       String
+  customerId      String
+  providerId      String
+  status          JobStatus     @default(CREATED)
+  scheduledAt     DateTime
+  priceCents      Int
+  commissionCents Int
+  notes           String?
+  cancelReason    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  service         Service       @relation(fields: [serviceId], references: [id])
+  customer        User          @relation("CustomerBookings", fields: [customerId], references: [id])
+  provider        User          @relation("ProviderBookings", fields: [providerId], references: [id])
+  payment         Payment?
+  review          Review?
+  dispute         Dispute?
+  statusEvents    BookingStatusEvent[]
+
+  @@index([customerId, status])
+  @@index([providerId, status])
+  @@map("bookings")
+}
+
+model BookingStatusEvent {
+  id        String    @id @default(cuid())
+  bookingId String
+  from      JobStatus?
+  to        JobStatus
+  actorId   String?
+  note      String?
+  createdAt DateTime  @default(now())
+  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  actor     User?     @relation("StatusActor", fields: [actorId], references: [id])
+
+  @@index([bookingId])
+  @@map("booking_status_events")
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  bookingId             String        @unique
+  status                PaymentStatus @default(PENDING)
+  amountCents           Int
+  commissionCents       Int
+  currency              String        @default("usd")
+  stripePaymentIntentId String?       @unique
+  stripeTransferId      String?
+  stripeChargeId        String?
+  method                String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  booking               Booking       @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model Wallet {
+  id                   String        @id @default(cuid())
+  userId               String        @unique
+  availableBalanceCents Int          @default(0)
+  pendingBalanceCents  Int           @default(0)
+  version              Int           @default(0)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  user                 User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions         LedgerEntry[]
+  withdrawals          Withdrawal[]
+
+  @@map("wallets")
+}
+
+model LedgerEntry {
+  id              String          @id @default(cuid())
+  walletId        String
+  type            TransactionType
+  amountCents     Int
+  availableAfter  Int
+  pendingAfter    Int
+  bookingId       String?
+  stripeRef       String?
+  description     String
+  createdAt       DateTime        @default(now())
+  wallet          Wallet          @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt])
+  @@index([bookingId])
+  @@map("ledger_entries")
+}
+
+model PlatformLedger {
+  id          String          @id @default(cuid())
+  type        TransactionType
+  amountCents Int
+  balanceAfter Int
+  bookingId   String?
+  description String
+  createdAt   DateTime        @default(now())
+
+  @@map("platform_ledger")
+}
+
+model PlatformBalance {
+  id           String   @id @default("platform")
+  balanceCents Int      @default(0)
+  updatedAt    DateTime @updatedAt
+
+  @@map("platform_balance")
+}
+
+model Withdrawal {
+  id              String           @id @default(cuid())
+  userId          String
+  walletId        String
+  amountCents     Int
+  status          WithdrawalStatus @default(PENDING)
+  stripePayoutId  String?
+  failureReason   String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  user            User             @relation(fields: [userId], references: [id])
+  wallet          Wallet           @relation(fields: [walletId], references: [id])
+
+  @@index([userId])
+  @@map("withdrawals")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  bookingId  String   @unique
+  authorId   String
+  subjectId  String
+  rating     Int
+  body       String?
+  createdAt  DateTime @default(now())
+  booking    Booking  @relation(fields: [bookingId], references: [id])
+  author     User     @relation("ReviewsGiven", fields: [authorId], references: [id])
+  subject    User     @relation("ReviewsReceived", fields: [subjectId], references: [id])
+
+  @@index([subjectId])
+  @@map("reviews")
+}
+
+model Report {
+  id          String           @id @default(cuid())
+  reporterId  String
+  targetType  ReportTargetType
+  targetId    String
+  targetUserId String?
+  reason      String
+  details     String?
+  status      ReportStatus     @default(OPEN)
+  adminNote   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  reporter    User             @relation("ReportsFiled", fields: [reporterId], references: [id])
+  targetUser  User?            @relation("ReportsAgainst", fields: [targetUserId], references: [id])
+
+  @@index([status])
+  @@map("reports")
+}
+
+model Dispute {
+  id          String        @id @default(cuid())
+  bookingId   String        @unique
+  openerId    String
+  reason      String
+  details     String?
+  status      DisputeStatus @default(OPEN)
+  resolution  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  booking     Booking       @relation(fields: [bookingId], references: [id])
+  opener      User          @relation("DisputesOpened", fields: [openerId], references: [id])
+
+  @@map("disputes")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model Conversation {
+  id         String    @id @default(cuid())
+  userAId    String
+  userBId    String
+  lastMessageAt DateTime @default(now())
+  createdAt  DateTime  @default(now())
+  userA      User      @relation("ConversationUserA", fields: [userAId], references: [id])
+  userB      User      @relation("ConversationUserB", fields: [userBId], references: [id])
+  messages   Message[]
+
+  @@unique([userAId, userBId])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String
+  readAt         DateTime?
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, createdAt])
+  @@map("messages")
+}
