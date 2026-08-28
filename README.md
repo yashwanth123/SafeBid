@@ -21,6 +21,8 @@ mobile/     Expo (React Native) client
 
 PostgreSQL is the source of truth. Wallet mutations use `SELECT … FOR UPDATE` so concurrent withdrawals cannot overdraft.
 
+**Go live (real domain + iOS/Android):** see [LAUNCH.md](./LAUNCH.md).
+
 ## Quick start (local)
 
 You need Node 20+ and PostgreSQL 16.

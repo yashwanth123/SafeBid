@@ -12,6 +12,20 @@ export const metadata: Metadata = {
   title: "SafeBid — verified neighbors, protected payments",
   description:
     "A hyperlocal community feed and services marketplace with ID verification and escrow.",
+  applicationName: "SafeBid",
+  appleWebApp: {
+    capable: true,
+    title: "SafeBid",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: "/icon.png",
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport = {
+  themeColor: "#1B4332",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

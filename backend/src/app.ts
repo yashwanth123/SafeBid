@@ -28,7 +28,12 @@ export function createApp() {
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(
     cors({
-      origin: true,
+      origin: (origin, callback) => {
+        if (!origin || env.NODE_ENV !== "production") return callback(null, true);
+        const allowed = env.FRONTEND_URL.split(",").map((s) => s.trim()).filter(Boolean);
+        if (allowed.includes("*") || allowed.includes(origin)) return callback(null, true);
+        return callback(null, false);
+      },
       credentials: true,
     }),
   );

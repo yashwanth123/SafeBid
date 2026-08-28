@@ -3,6 +3,8 @@ services:
     name: safebid-api
     runtime: node
     rootDir: backend
+    plan: starter
+    region: oregon
     buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npx prisma migrate deploy && node dist/server.js
     healthCheckPath: /api/health
@@ -13,16 +15,23 @@ services:
         fromDatabase:
           name: safebid-db
           property: connectionString
-  - type: web
-    name: safebid-web
-    runtime: node
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    startCommand: npm start
-    envVars:
-      - key: NEXT_PUBLIC_API_URL
+      - key: FRONTEND_URL
+        sync: false
+      - key: JWT_ACCESS_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: PLATFORM_COMMISSION_BPS
+        value: "500"
+      - key: MOCK_PAYMENTS
+        value: "true"
+      - key: MOCK_IDENTITY
+        value: "true"
+      - key: INVITE_CODE
         sync: false
 
 databases:
   - name: safebid-db
-    plan: free
+    plan: basic-256mb
+    region: oregon
+    postgresMajorVersion: "16"
