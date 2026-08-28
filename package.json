@@ -1,0 +1,19 @@
+{
+  "name": "safebid",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SafeBid — hyperlocal community and verified services marketplace",
+  "scripts": {
+    "dev": "npm run dev:backend & npm run dev:frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "test": "npm test --prefix backend",
+    "db:migrate": "npm run prisma:migrate --prefix backend",
+    "db:seed": "npm run prisma:seed --prefix backend",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
