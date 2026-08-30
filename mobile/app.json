@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "SafeBid",
+    "slug": "safebid",
+    "scheme": "safebid",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1B4332"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.safebid.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "SafeBid uses your location to show posts and jobs on your block."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#1B4332"
+      },
+      "package": "com.safebid.app",
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Show neighborhood posts and nearby jobs."
+        }
+      ]
+    ]
+  }
+}

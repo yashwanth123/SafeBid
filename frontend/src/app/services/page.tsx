@@ -36,14 +36,19 @@ export default function ServicesPage() {
         <div>
           <h1 className="font-serif text-3xl">Hire someone on the block</h1>
           <p className="text-sm text-forest-700/70">
-            Payments stay in escrow. Providers are ID-verified.
+            Book a listed pro at their posted price, or post a job with one fair number. No comment bidding.
           </p>
         </div>
-        <Link href="/services/new">
-          <Button variant={user?.verificationStatus === "VERIFIED" ? "primary" : "outline"}>
-            List a service
-          </Button>
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/jobs/new">
+            <Button>Need work done</Button>
+          </Link>
+          <Link href="/services/new">
+            <Button variant={user?.verificationStatus === "VERIFIED" ? "primary" : "outline"}>
+              List a service
+            </Button>
+          </Link>
+        </div>
       </div>
       <form
         className="mb-4 flex gap-2"
@@ -75,6 +80,11 @@ export default function ServicesPage() {
           <ServiceCard key={s.id} service={s} />
         ))}
       </div>
+      <p className="mt-6 text-center text-sm">
+        <Link href="/jobs" className="text-forest-700 underline dark:text-forest-200">
+          Or take an open job at the posted price
+        </Link>
+      </p>
     </div>
   );
 }

@@ -3,7 +3,8 @@ import { z } from "zod";
 import { PostCategory } from "@prisma/client";
 import { prisma } from "../../lib/prisma";
 import { asyncHandler } from "../../lib/asyncHandler";
-import { forbidden, notFound } from "../../lib/errors";
+import { badRequest, forbidden, notFound } from "../../lib/errors";
+import { looksLikePriceQuote } from "../../lib/rateCard";
 import { boundingBox, haversineKm } from "../../lib/geo";
 import { toPublicUser } from "../../lib/serializers";
 import { emitFeed } from "../../realtime/socket";
@@ -98,6 +99,12 @@ postsRouter.post(
   requireAuth,
   validate(createSchema),
   asyncHandler(async (req, res) => {
+    if (req.body.category === "JOBS") {
+      throw badRequest(
+        "Don't hire in the comment thread. Post a job with one fair price — neighbors take it or skip it.",
+        { redirect: "/jobs/new" },
+      );
+    }
     const me = await prisma.user.findUnique({ where: { id: req.user!.id } });
     const post = await prisma.post.create({
       data: {
@@ -210,6 +217,12 @@ postsRouter.post(
   asyncHandler(async (req, res) => {
     const post = await prisma.post.findUnique({ where: { id: req.params.id } });
     if (!post) throw notFound("Post not found");
+    if (looksLikePriceQuote(req.body.body)) {
+      throw badRequest(
+        "Don't quote a price in comments. Open Jobs, take the posted price, and the work becomes a real escrowed job.",
+        { redirect: "/jobs" },
+      );
+    }
     const comment = await prisma.comment.create({
       data: { postId: post.id, authorId: req.user!.id, body: req.body.body },
       include: { author: true },

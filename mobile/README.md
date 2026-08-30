@@ -1,11 +1,14 @@
 # SafeBid mobile (Expo)
 
-Scaffold for App Store + Play. It uses the same REST API as `frontend/`.
+Native iOS + Android client for the same SafeBid API as the web app.
 
 ```bash
 cd mobile
+cp .env.example .env   # set EXPO_PUBLIC_API_URL=https://api.YOUR_DOMAIN
 npm install
 npx expo start
 ```
 
-Set `EXPO_PUBLIC_API_URL` to the backend origin. Auth, feed, bookings, and wallet endpoints are documented at `{API}/api/docs`.
+Scan the QR code with **Expo Go** (Android) or the Camera app (iOS) for a device preview.
+
+Production / TestFlight / Play internal builds: see [../LAUNCH.md](../LAUNCH.md). Bundle ID / application id is `com.safebid.app`.

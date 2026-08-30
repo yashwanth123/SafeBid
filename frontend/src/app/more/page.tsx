@@ -5,9 +5,11 @@ import { useAuth } from "@/lib/auth";
 import { Card } from "@/components/ui/card";
 
 const links = [
+  { href: "/jobs/new", label: "Post a job (fair posted price)" },
   { href: "/wallet", label: "Wallet & withdrawals" },
   { href: "/verify", label: "ID verification" },
   { href: "/bookings", label: "Jobs & escrow" },
+  { href: "/messages", label: "Messages" },
   { href: "/onboarding", label: "Neighborhood radius" },
   { href: "/admin", label: "Admin console", admin: true },
 ];

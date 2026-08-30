@@ -1,25 +1,26 @@
 import Link from "next/link";
-import { ShieldCheck, MapPin, Banknote, BadgeCheck } from "lucide-react";
+import { Scale, ShieldCheck, MapPin, Banknote, BadgeCheck } from "lucide-react";
 
 export default function LandingPage() {
   return (
     <div className="space-y-16 pb-8">
       <section className="relative overflow-hidden rounded-[2.2rem] bg-forest-600 px-6 py-16 text-white md:px-12 md:py-20">
         <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-forest-400/40 blur-3xl" />
-        <p className="text-sm uppercase tracking-[0.2em] text-forest-100">Your block, with receipts</p>
+        <p className="text-sm uppercase tracking-[0.2em] text-forest-100">Private friends beta</p>
         <h1 className="mt-4 max-w-2xl font-serif text-4xl leading-tight md:text-6xl">
           Know the person. Hold the payment. Live next door.
         </h1>
         <p className="mt-5 max-w-xl text-forest-50/90">
-          SafeBid is a neighborhood feed and services marketplace. Providers verify a government ID.
-          Customer funds sit in escrow until the job is done — we keep 5% to keep the lights on.
+          SafeBid is a neighborhood feed and a fair-price jobs board. One posted price. First
+          verified neighbor to take it gets the work. Money sits in escrow until you review.
+          Invite-only for now — you need a code from Yashwanth.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
             href="/register"
             className="rounded-full bg-white px-6 py-3 text-sm font-medium text-forest-700"
           >
-            Join your neighborhood
+            Join with an invite
           </Link>
           <Link
             href="/login"
@@ -33,9 +34,14 @@ export default function LandingPage() {
       <section className="grid gap-4 md:grid-cols-2">
         {[
           {
+            icon: Scale,
+            title: "One fair price",
+            body: "Nextdoor lets ten people comment ten prices. Here the listing is the contract. Take it or skip it — then escrow makes the job real.",
+          },
+          {
             icon: MapPin,
             title: "Hyperlocal feed",
-            body: "Posts, lost & found, and recs from people inside your walking radius — not the whole internet.",
+            body: "Posts, lost & found, and recs from people inside your walking radius — not the whole internet. Hiring belongs on Jobs, not in comments.",
           },
           {
             icon: BadgeCheck,

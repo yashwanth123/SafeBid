@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Newspaper, Store, MessageCircle, UserRound, Menu } from "lucide-react";
+import { Newspaper, Briefcase, Store, UserRound, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import { ThemeToggle } from "./ThemeToggle";
@@ -11,9 +11,9 @@ import { Logo } from "./Logo";
 
 const tabs = [
   { href: "/feed", label: "Feed", icon: Newspaper },
-  { href: "/services", label: "Services", icon: Store },
-  { href: "/messages", label: "Messages", icon: MessageCircle },
-  { href: "/profile", label: "Profile", icon: UserRound },
+  { href: "/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/services", label: "Hire", icon: Store },
+  { href: "/profile", label: "You", icon: UserRound },
   { href: "/more", label: "More", icon: Menu },
 ];
 

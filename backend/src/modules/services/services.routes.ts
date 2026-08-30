@@ -8,6 +8,7 @@ import { boundingBox, haversineKm } from "../../lib/geo";
 import { toPublicUser } from "../../lib/serializers";
 import { validate } from "../../middleware/errorHandler";
 import { optionalAuth, requireAuth, requireVerified } from "../../middleware/auth";
+import { assertFairPrice } from "../../lib/rateCard";
 
 export const servicesRouter = Router();
 
@@ -75,6 +76,7 @@ servicesRouter.post(
   requireVerified,
   validate(createSchema),
   asyncHandler(async (req, res) => {
+    assertFairPrice(req.body.category, req.body.priceCents);
     const me = await prisma.user.findUnique({ where: { id: req.user!.id } });
     const service = await prisma.service.create({
       data: {
@@ -134,6 +136,9 @@ servicesRouter.patch(
     const service = await prisma.service.findUnique({ where: { id: req.params.id } });
     if (!service) throw notFound("Service not found");
     if (service.providerId !== req.user!.id && req.user!.role !== "ADMIN") throw forbidden();
+    const nextCategory = req.body.category ?? service.category;
+    const nextPrice = req.body.priceCents ?? service.priceCents;
+    assertFairPrice(nextCategory, nextPrice);
     const updated = await prisma.service.update({
       where: { id: service.id },
       data: req.body,

@@ -154,6 +154,25 @@ async function main() {
     });
   }
 
+  const existingJobs = await prisma.jobRequest.count();
+  if (existingJobs === 0) {
+    await prisma.jobRequest.create({
+      data: {
+        customerId: jordan.id,
+        title: "Assemble a Hemnes dresser Saturday",
+        description:
+          "Box is in the garage. Parking on the alley. I will pay the posted price into escrow as soon as someone takes it — no haggling.",
+        category: ServiceCategory.HOME,
+        priceCents: 7000,
+        suggestedCents: 8500,
+        scheduledAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        latitude: jordan.latitude,
+        longitude: jordan.longitude,
+        address: jordan.address,
+      },
+    });
+  }
+
   const existingPosts = await prisma.post.count();
   if (existingPosts === 0) {
     await prisma.post.createMany({

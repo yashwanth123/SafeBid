@@ -10,6 +10,7 @@ import { authRouter } from "./modules/auth/auth.routes";
 import { usersRouter } from "./modules/users/users.routes";
 import { postsRouter } from "./modules/posts/posts.routes";
 import { servicesRouter } from "./modules/services/services.routes";
+import { jobsRouter } from "./modules/jobs/jobs.routes";
 import { bookingsRouter } from "./modules/bookings/bookings.routes";
 import { paymentsRouter, stripeWebhookHandler } from "./modules/payments/payments.routes";
 import { identityRouter } from "./modules/identity/identity.routes";
@@ -28,7 +29,12 @@ export function createApp() {
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(
     cors({
-      origin: env.FRONTEND_URL,
+      origin: (origin, callback) => {
+        if (!origin || env.NODE_ENV !== "production") return callback(null, true);
+        const allowed = env.FRONTEND_URL.split(",").map((s) => s.trim()).filter(Boolean);
+        if (allowed.includes("*") || allowed.includes(origin)) return callback(null, true);
+        return callback(null, false);
+      },
       credentials: true,
     }),
   );
@@ -55,13 +61,32 @@ export function createApp() {
     res.json({ ok: true, name: "safebid-api", time: new Date().toISOString() });
   });
 
+  app.get("/api/meta", (_req, res) => {
+    res.json({
+      name: "safebid",
+      inviteRequired: Boolean(env.INVITE_CODE),
+      mockPayments: env.MOCK_PAYMENTS,
+      mockIdentity: env.MOCK_IDENTITY,
+    });
+  });
+
   app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiSpec));
   app.get("/api/docs.json", (_req, res) => res.json(openApiSpec));
 
-  app.use("/api/auth", authRouter);
+  app.use(
+    "/api/auth",
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: env.NODE_ENV === "test" ? 1000 : 40,
+      standardHeaders: true,
+      legacyHeaders: false,
+    }),
+    authRouter,
+  );
   app.use("/api/users", usersRouter);
   app.use("/api/posts", postsRouter);
   app.use("/api/services", servicesRouter);
+  app.use("/api/jobs", jobsRouter);
   app.use("/api/bookings", bookingsRouter);
   app.use("/api/payments", paymentsRouter);
   app.use("/api/identity", identityRouter);
