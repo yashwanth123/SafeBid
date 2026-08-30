@@ -31,13 +31,33 @@ Buy it at Cloudflare Registrar, Namecheap, or Google Domains. You will point DNS
 
 ## 3. Host the web app (Vercel)
 
-1. Create a Vercel account, import the same GitHub repo.
-2. **Root Directory:** `frontend`
-3. Environment variables:
-   - `NEXT_PUBLIC_API_URL=` (leave empty — same-origin `/api` proxy)
-   - `API_INTERNAL_URL=https://api.YOUR_DOMAIN`
-   - `NEXT_PUBLIC_MOCK_PAYMENTS=true`
-4. Add custom domain `YOUR_DOMAIN` and `www.YOUR_DOMAIN`.
+**Do not use Application Preset: Services.** That screen is why Import is greyed out. Vercel saw both `frontend/` (Next.js) and `backend/` (Express) and wants to host them together. Express + Postgres + Socket.io do **not** belong on Vercel Hobby. The API goes on Render (step 2). Vercel only builds the Next.js app.
+
+### If Import is greyed out (current New Project screen)
+
+You are on the wrong preset. Leave that page.
+
+1. Click **Import a different Git Repository** (bottom of the page) or go to [vercel.com/new](https://vercel.com/new).
+2. Pick `yashwanth123/SafeBid` again.
+3. Change **Application Preset** from **Services** to **Next.js**.  
+   If you cannot find that dropdown, click **Root Directory** (it currently says `./`) → **Edit** → select **`frontend`**. After that, Services should disappear and Import enables.
+4. Delete every env var Vercel pulled from the repo (POSTGRES_*, DATABASE_URL, JWT_*, STRIPE_*, GOOGLE_*, APPLE_*, PORT, …). Those are for Render, not Vercel. Empty required fields also keep Import disabled.
+5. Add only these three (Production + Preview):
+
+   | Key | Value |
+   | --- | --- |
+   | `NEXT_PUBLIC_API_URL` | *(leave empty)* |
+   | `NEXT_PUBLIC_MOCK_PAYMENTS` | `true` |
+   | `API_INTERNAL_URL` | your Render API URL, e.g. `https://safebid-api.onrender.com` (you can paste this after Render is live; use `http://127.0.0.1:4000` only for local) |
+
+6. Click **Import** / **Deploy**.
+
+Do **not** paste the multi-service `vercel.json` Vercel showed (`services.frontend` + `services.backend`). That config is for a different product shape. This repo already has `frontend/vercel.json` for a normal Next.js project.
+
+### After the project exists
+
+1. Settings → Git: Production branch can stay `main` (merge the SafeBid PR first) or point at `cursor/safebid-marketplace-mvp-811e`.
+2. Add custom domain `YOUR_DOMAIN` and `www.YOUR_DOMAIN` when you have one. Until then, use the `*.vercel.app` URL.
 
 ## 4. DNS (example for `safebid.app`)
 

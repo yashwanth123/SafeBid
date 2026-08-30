@@ -21,7 +21,7 @@ mobile/     Expo (React Native) client
 
 PostgreSQL is the source of truth. Wallet mutations use `SELECT … FOR UPDATE` so concurrent withdrawals cannot overdraft.
 
-**Go live (real domain + iOS/Android):** see [LAUNCH.md](./LAUNCH.md).
+**Go live (Render API + Vercel web):** see [LAUNCH.md](./LAUNCH.md). If Vercel greys out Import, you are on the Services preset — set Root Directory to `frontend` and host Express on Render, not Vercel.
 
 ## Quick start (local)
 
