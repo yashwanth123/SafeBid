@@ -19,6 +19,7 @@ export async function resetDb() {
     "booking_status_events",
     "payments",
     "bookings",
+    "job_requests",
     "services",
     "shares",
     "likes",

@@ -2,11 +2,9 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { money } from "@/lib/utils";
-import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -21,15 +19,16 @@ type Rate = {
   maxCents: number;
 };
 
-export default function NewServicePage() {
-  const { user } = useAuth();
+export default function NewJobPage() {
   const router = useRouter();
   const [rates, setRates] = useState<Rate[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [price, setPrice] = useState(85);
   const [category, setCategory] = useState("HOME");
+  const [price, setPrice] = useState(85);
+  const [when, setWhen] = useState("");
   const [loading, setLoading] = useState(false);
+
   const rate = useMemo(() => rates.find((r) => r.category === category), [rates, category]);
 
   useEffect(() => {
@@ -39,44 +38,32 @@ export default function NewServicePage() {
         const home = d.rates.find((r) => r.category === "HOME");
         if (home) setPrice(home.suggestedCents / 100);
       })
-      .catch(() => undefined);
+      .catch((err) => toast.error(err.message));
   }, []);
 
   useEffect(() => {
     if (rate) setPrice(rate.suggestedCents / 100);
   }, [rate]);
 
-  if (user && user.verificationStatus !== "VERIFIED") {
-    return (
-      <Card className="mx-auto max-w-lg">
-        <h1 className="font-serif text-2xl">Verify your ID first</h1>
-        <p className="mt-2 text-sm text-forest-700/70">
-          SafeBid requires government ID + selfie verification before anyone can offer paid work.
-        </p>
-        <Link href="/verify">
-          <Button className="mt-4">Start verification</Button>
-        </Link>
-      </Card>
-    );
-  }
-
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!when) return toast.error("Pick when you need it done");
     setLoading(true);
     try {
-      const data = await api<{ service: { id: string } }>("/api/services", {
+      const data = await api<{ job: { id: string } }>("/api/jobs", {
         method: "POST",
         body: JSON.stringify({
           title,
           description,
-          priceCents: Math.round(Number(price) * 100),
           category,
+          priceCents: Math.round(Number(price) * 100),
+          scheduledAt: new Date(when).toISOString(),
         }),
       });
-      toast.success("Service listed at a posted price");
-      router.push(`/services/${data.service.id}`);
+      toast.success("Job posted at a locked price");
+      router.push(`/jobs/${data.job.id}`);
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not list service");
+      toast.error(err instanceof Error ? err.message : "Could not post job");
     } finally {
       setLoading(false);
     }
@@ -84,16 +71,17 @@ export default function NewServicePage() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <h1 className="font-serif text-3xl">Offer a service</h1>
+      <h1 className="font-serif text-3xl">Post a job</h1>
       <p className="mt-2 text-sm text-forest-700/70">
-        Your listing price is the contract. Customers book it — they cannot counter in comments.
+        Set one fair price from the neighborhood rate card. Verified neighbors take it or skip it.
+        Nobody comments a different number.
       </p>
       <Card className="mt-5">
         <form onSubmit={onSubmit} className="space-y-3">
-          <Input required placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+          <Input required placeholder="What needs doing?" value={title} onChange={(e) => setTitle(e.target.value)} />
           <Textarea
             required
-            placeholder="What you do, how long it takes, what’s included"
+            placeholder="What’s included, access notes, parking, pets"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -125,15 +113,17 @@ export default function NewServicePage() {
               />
               <p className="mt-1 text-xs text-forest-700/60">
                 Fair band {money(rate.minCents)}–{money(rate.maxCents)} · neighborhood rate{" "}
-                {money(rate.suggestedCents)}
+                {money(rate.suggestedCents)} / {rate.unit}
               </p>
             </div>
           )}
+          <Input type="datetime-local" required value={when} onChange={(e) => setWhen(e.target.value)} />
           <p className="text-xs text-forest-700/60">
-            Customers pay this amount into escrow. SafeBid keeps 5% when the job is reviewed.
+            You pay this amount into escrow after someone takes the job. SafeBid keeps 5% when you
+            review the work.
           </p>
           <Button className="w-full" disabled={loading}>
-            {loading ? "Publishing…" : "Publish listing"}
+            {loading ? "Posting…" : "Post this price"}
           </Button>
         </form>
       </Card>

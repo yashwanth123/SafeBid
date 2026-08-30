@@ -10,6 +10,7 @@ import { authRouter } from "./modules/auth/auth.routes";
 import { usersRouter } from "./modules/users/users.routes";
 import { postsRouter } from "./modules/posts/posts.routes";
 import { servicesRouter } from "./modules/services/services.routes";
+import { jobsRouter } from "./modules/jobs/jobs.routes";
 import { bookingsRouter } from "./modules/bookings/bookings.routes";
 import { paymentsRouter, stripeWebhookHandler } from "./modules/payments/payments.routes";
 import { identityRouter } from "./modules/identity/identity.routes";
@@ -85,6 +86,7 @@ export function createApp() {
   app.use("/api/users", usersRouter);
   app.use("/api/posts", postsRouter);
   app.use("/api/services", servicesRouter);
+  app.use("/api/jobs", jobsRouter);
   app.use("/api/bookings", bookingsRouter);
   app.use("/api/payments", paymentsRouter);
   app.use("/api/identity", identityRouter);

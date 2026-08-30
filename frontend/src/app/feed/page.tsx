@@ -13,8 +13,6 @@ const cats = [
   { id: "EVENTS", label: "Events" },
   { id: "LOST_FOUND", label: "Lost & found" },
   { id: "RECOMMENDATIONS", label: "Recs" },
-  { id: "SERVICES", label: "Services" },
-  { id: "JOBS", label: "Jobs" },
 ];
 
 export default function FeedPage() {
@@ -56,7 +54,13 @@ export default function FeedPage() {
       <div className="mb-5 flex items-end justify-between gap-3">
         <div>
           <h1 className="font-serif text-3xl">On the block</h1>
-          <p className="text-sm text-forest-700/70">What neighbors are saying within your radius.</p>
+          <p className="text-sm text-forest-700/70">
+            What neighbors are saying within your radius. Need work done?{" "}
+            <Link href="/jobs/new" className="underline">
+              Post a priced job
+            </Link>
+            .
+          </p>
         </div>
         <Link href="/feed/new">
           <Button>New post</Button>

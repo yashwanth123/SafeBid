@@ -110,6 +110,12 @@ enum NotificationType {
   MODERATION
 }
 
+enum JobRequestStatus {
+  OPEN
+  CLAIMED
+  CANCELLED
+}
+
 model User {
   id                      String             @id @default(cuid())
   email                   String             @unique
@@ -163,6 +169,8 @@ model User {
   disputesOpened     Dispute[]           @relation("DisputesOpened")
   withdrawals        Withdrawal[]
   statusEvents       BookingStatusEvent[] @relation("StatusActor")
+  jobRequests        JobRequest[]         @relation("CustomerJobs")
+  claimedJobs        JobRequest[]         @relation("ClaimedJobs")
 
   @@index([latitude, longitude])
   @@index([verificationStatus])
@@ -266,6 +274,33 @@ model Service {
   @@map("services")
 }
 
+model JobRequest {
+  id             String           @id @default(cuid())
+  customerId     String
+  title          String
+  description    String
+  category       ServiceCategory
+  priceCents     Int
+  suggestedCents Int
+  scheduledAt    DateTime
+  status         JobRequestStatus @default(OPEN)
+  claimedById    String?
+  bookingId      String?          @unique
+  latitude       Float?
+  longitude      Float?
+  address        String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  customer       User             @relation("CustomerJobs", fields: [customerId], references: [id], onDelete: Cascade)
+  claimedBy      User?            @relation("ClaimedJobs", fields: [claimedById], references: [id])
+  booking        Booking?         @relation(fields: [bookingId], references: [id])
+
+  @@index([status, createdAt])
+  @@index([category])
+  @@index([latitude, longitude])
+  @@map("job_requests")
+}
+
 model Booking {
   id              String        @id @default(cuid())
   serviceId       String
@@ -286,6 +321,7 @@ model Booking {
   review          Review?
   dispute         Dispute?
   statusEvents    BookingStatusEvent[]
+  jobRequest      JobRequest?
 
   @@index([customerId, status])
   @@index([providerId, status])

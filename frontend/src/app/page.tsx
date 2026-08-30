@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ShieldCheck, MapPin, Banknote, BadgeCheck } from "lucide-react";
+import { Scale, ShieldCheck, MapPin, Banknote, BadgeCheck } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -11,8 +11,9 @@ export default function LandingPage() {
           Know the person. Hold the payment. Live next door.
         </h1>
         <p className="mt-5 max-w-xl text-forest-50/90">
-          SafeBid is a neighborhood feed and services marketplace. Invite-only for now — you need a
-          code from Yashwanth. Payments and ID verification are simulated until Stripe is connected.
+          SafeBid is a neighborhood feed and a fair-price jobs board. One posted price. First
+          verified neighbor to take it gets the work. Money sits in escrow until you review.
+          Invite-only for now — you need a code from Yashwanth.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <Link
@@ -33,9 +34,14 @@ export default function LandingPage() {
       <section className="grid gap-4 md:grid-cols-2">
         {[
           {
+            icon: Scale,
+            title: "One fair price",
+            body: "Nextdoor lets ten people comment ten prices. Here the listing is the contract. Take it or skip it — then escrow makes the job real.",
+          },
+          {
             icon: MapPin,
             title: "Hyperlocal feed",
-            body: "Posts, lost & found, and recs from people inside your walking radius — not the whole internet.",
+            body: "Posts, lost & found, and recs from people inside your walking radius — not the whole internet. Hiring belongs on Jobs, not in comments.",
           },
           {
             icon: BadgeCheck,

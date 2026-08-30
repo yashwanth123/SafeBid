@@ -41,6 +41,20 @@ export const openApiSpec = {
       get: { summary: "List nearby services", security: [], responses: { "200": { description: "OK" } } },
       post: { summary: "Create service (verified providers)", responses: { "201": { description: "Created" } } },
     },
+    "/jobs/rates": {
+      get: {
+        summary: "Neighborhood rate card (fair posted prices)",
+        security: [],
+        responses: { "200": { description: "OK" } },
+      },
+    },
+    "/jobs": {
+      get: { summary: "Open jobs nearby", security: [], responses: { "200": { description: "OK" } } },
+      post: { summary: "Post a job at a locked fair price", responses: { "201": { description: "Created" } } },
+    },
+    "/jobs/{id}/claim": {
+      post: { summary: "Verified provider takes the job at the posted price", responses: { "201": { description: "Created" } } },
+    },
     "/bookings": {
       get: { summary: "List bookings", responses: { "200": { description: "OK" } } },
       post: { summary: "Create booking", responses: { "201": { description: "Created" } } },

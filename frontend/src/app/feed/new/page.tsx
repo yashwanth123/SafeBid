@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api, apiUrl } from "@/lib/api";
@@ -8,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 
-const cats = ["GENERAL", "EVENTS", "LOST_FOUND", "RECOMMENDATIONS", "SERVICES", "JOBS"] as const;
+const cats = ["GENERAL", "EVENTS", "LOST_FOUND", "RECOMMENDATIONS"] as const;
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -45,6 +46,13 @@ export default function NewPostPage() {
   return (
     <div className="mx-auto max-w-xl">
       <h1 className="font-serif text-3xl">Share with neighbors</h1>
+      <p className="mt-2 text-sm text-forest-700/70">
+        Hiring or offering paid work?{" "}
+        <Link href="/jobs/new" className="underline">
+          Post a job with one price
+        </Link>{" "}
+        instead of asking people to comment quotes.
+      </p>
       <Card className="mt-5">
         <form onSubmit={onSubmit} className="space-y-3">
           <div className="flex flex-wrap gap-2">

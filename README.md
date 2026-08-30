@@ -2,11 +2,13 @@
 
 Hyperlocal community feed + verified services marketplace. Neighbors post what’s happening on the block. Service providers verify a government ID. Customers pay into **escrow**; funds release after the job is reviewed. SafeBid keeps **5%**.
 
+Hiring is **posted-price only**: a neighborhood rate card sets a fair band, the listing is the contract, and the first verified neighbor to take the job gets the work. Comment-thread quotes (the Nextdoor problem) are blocked.
+
 This repository is a Phase-1 MVP:
 
 1. Email/password auth (Google/Apple hooks included)
-2. Geo-filtered community feed
-3. Service listings and bookings
+2. Geo-filtered community feed (hiring does not live in comments)
+3. Fair-price job board + service listings
 4. Escrow payments with a 5% platform commission
 5. Stripe Identity (or demo mock) for provider KYC
 6. Admin dashboard

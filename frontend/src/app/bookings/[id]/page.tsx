@@ -81,6 +81,26 @@ export default function BookingDetailPage() {
         {booking.notes && <p className="mt-3 text-sm italic">{booking.notes}</p>}
       </Card>
       <div className="flex flex-wrap gap-2">
+        {isCustomer && booking.status === "CREATED" && booking.payment?.status === "PENDING" && (
+          <Button
+            onClick={async () => {
+              try {
+                const pay = await api<{ status: string }>(`/api/payments/bookings/${params.id}/intent`, {
+                  method: "POST",
+                });
+                toast.success(pay.status === "ESCROWED" ? "Funds are in escrow" : "Continue to payment");
+                load();
+              } catch (err) {
+                toast.error(err instanceof Error ? err.message : "Payment failed");
+              }
+            }}
+          >
+            Pay {money(booking.priceCents)} into escrow
+          </Button>
+        )}
+        {isProvider && booking.status === "CREATED" && booking.payment?.status === "PENDING" && (
+          <p className="text-sm text-forest-700/70">Waiting for the customer to fund escrow.</p>
+        )}
         {isProvider && booking.status === "CREATED" && booking.payment?.status === "ESCROWED" && (
           <Button onClick={() => act("confirm")}>Confirm job</Button>
         )}
